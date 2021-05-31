@@ -1,5 +1,5 @@
 body {
-  background-color: #a4e5e0;
+  background-color: #45b08c;
   font-family: "Courier New", Courier, monospace;
 }
 #container {
@@ -17,9 +17,34 @@ body {
   margin: 10px auto;
 }
 
-.letter-button {
-  border: 1px solid black;
+.button {
+  font-family: inherit;
+  border: 2px solid #255d60;
   font-size: 1.5rem;
+  background-color: #a4dbc8;
+  color: #000;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin: 5px;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.button:hover {
+  background-color: #2b6e58;
+  color: #a4dbc8;
+  border-color: #1e4d3d;
+}
+
+.button:hover:disabled {
+  background-color: #a4dbc8;
+  color: #000;
+  border-color: #255d60;
+}
+
+.button:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .current-word {
@@ -39,6 +64,11 @@ body {
 }
 
 .next-button {
-  border: 1px solid black;
   font-size: 1.8rem;
+  text-transform: uppercase;
+}
+
+.word-definition {
+  font-size: 1.1rem;
+  font-weight: bold;
 }

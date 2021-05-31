@@ -124,7 +124,11 @@ export default function App() {
   };
 
   const renderWordDefiniton = () => {
-    return <p>{wordDefinition || "No definition available"}</p>;
+    return (
+      <p className="word-definition">
+        {wordDefinition || "No definition available"}
+      </p>
+    );
   };
 
   const renderLetterButtons = (letters) => {
@@ -135,6 +139,7 @@ export default function App() {
             key={idx}
             letter={letter}
             handleClick={handleLetterButtonClick}
+            disabled={filledLetters.includes(letter)}
           />
         ))}
       </div>
@@ -143,7 +148,7 @@ export default function App() {
 
   const renderNextButton = () => (
     <button
-      className="next-button"
+      className="next-button button"
       onClick={handleClickNext}
       disabled={isDisabledNext}
     >
