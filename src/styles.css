@@ -1,4 +1,44 @@
-.App {
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  text-align: center;
+body {
+  background-color: #a4e5e0;
+  font-family: "Courier New", Courier, monospace;
+}
+#container {
+  width: 90vw;
+  margin: 20px auto;
+}
+.app {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.letter-buttons {
+  margin: 10px auto;
+}
+
+.letter-button {
+  border: 1px solid black;
+  font-size: 1.5rem;
+}
+
+.current-word {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 10px auto;
+  line-height: 99%;
+  display: flex;
+}
+.current-word-letter {
+  display: flex;
+  align-items: center;
+  width: 2rem;
+  margin: 0 8px;
+  border-bottom: 2px solid black;
+  padding: 0;
+}
+
+.next-button {
+  border: 1px solid black;
+  font-size: 1.8rem;
 }
