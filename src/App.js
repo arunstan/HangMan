@@ -9,6 +9,8 @@ export default function App() {
   const [filledLetters, setFilledLetters] = useState([]);
   const [wordDefinition, setWordDefinition] = useState("");
   const [isDisabledNext, setIsDisabledNext] = useState(false);
+  const [solvedCount, setSolvedCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     setIsDisabledNext(true);
@@ -22,6 +24,7 @@ export default function App() {
 
   useEffect(() => {
     if (isWordFilled()) {
+      setSolvedCount((solvedCount) => solvedCount + 1);
       setIsDisabledNext(true);
       setTimeout(resetWord, 2000);
     }
@@ -65,9 +68,9 @@ export default function App() {
       );
       const [word] = wordData;
       if (word) {
-        console.log(word);
         setWord(word.toUpperCase());
         setIsDisabledNext(false);
+        setTotalCount((totalCount) => totalCount + 1);
       }
     } catch (e) {
       console.error("Error while fetching word data ", e);
@@ -161,6 +164,9 @@ export default function App() {
         {renderCurrentWord()}
         {renderWordDefiniton()}
         {renderLetterButtons(getLetters())}
+        <p>
+          {solvedCount}/{totalCount}
+        </p>
         {renderNextButton()}
       </div>
     </div>

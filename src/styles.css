@@ -13,8 +13,14 @@ body {
   justify-content: center;
 }
 
+h1 {
+  font-size: 3.4rem;
+  color: #a4dbc8;
+  -webkit-text-stroke: 0.05rem black;
+}
+
 .letter-buttons {
-  margin: 10px auto;
+  margin: 10px auto 20px;
 }
 
 .button {
