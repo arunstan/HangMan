@@ -59,6 +59,7 @@ h1 {
   margin: 10px auto;
   line-height: 99%;
   display: flex;
+  transition: all 0.75s;
 }
 .current-word-letter {
   display: flex;
@@ -67,6 +68,11 @@ h1 {
   margin: 0 8px;
   border-bottom: 2px solid black;
   padding: 0;
+}
+
+.current-word.is-word-solved {
+  color: #dbf1e9;
+  text-shadow: 1px 1px 12px #ccc;
 }
 
 .next-button {
@@ -100,5 +106,5 @@ h1 {
 }
 
 .details-block .stats p .value {
-  color: #000;
+  color: #dbf1e9;
 }

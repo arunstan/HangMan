@@ -8,7 +8,7 @@ export default function App() {
   const WORD_JAR_SIZE_INIT = 1;
   const WORD_JAR_SIZE_REFRESH = 3;
   const WORD_FETCH_BUFFER = 3;
-  const WORD_POST_REVEAL_DURATION = 1500;
+  const WORD_POST_REVEAL_DURATION = 2000;
 
   const [word, setWord] = useState("");
   const [filledLetters, setFilledLetters] = useState([]);
@@ -18,6 +18,7 @@ export default function App() {
   const [totalCount, setTotalCount] = useState(0);
   const [wordJar, updateWordJar] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [isWordSolved, setIsWordSolved] = useState(false);
 
   useEffect(() => {
     initGame();
@@ -42,7 +43,8 @@ export default function App() {
   }, [word]);
 
   useEffect(() => {
-    if (isWordFilled()) {
+    if (checkIsWordSolved()) {
+      setIsWordSolved(true);
       setSolvedCount((solvedCount) => solvedCount + 1);
       setTimeout(pickWord, WORD_POST_REVEAL_DURATION);
     }
@@ -54,6 +56,7 @@ export default function App() {
   };
 
   const pickWord = () => {
+    setIsWordSolved(false);
     const [nextWord, ...restWords] = wordJar;
     setFilledLetters([]);
     updateWordJar(restWords);
@@ -135,7 +138,7 @@ export default function App() {
     }
   };
 
-  const isWordFilled = () =>
+  const checkIsWordSolved = () =>
     word
       ? word.split("").every((letter) => filledLetters.includes(letter))
       : false;
@@ -167,7 +170,11 @@ export default function App() {
 
   const renderCurrentWord = () => {
     return word ? (
-      <CurrentWord word={word} filledLetters={filledLetters} />
+      <CurrentWord
+        word={word}
+        filledLetters={filledLetters}
+        isWordSolved={isWordSolved}
+      />
     ) : (
       "Loading..."
     );
