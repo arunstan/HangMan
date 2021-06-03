@@ -70,11 +70,35 @@ h1 {
 }
 
 .next-button {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   text-transform: uppercase;
 }
 
 .word-definition {
   font-size: 1.1rem;
   font-weight: bold;
+}
+
+.details-block {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  width: 100%;
+  align-items: flex-start;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.details-block .stats p {
+  margin: 3px;
+}
+
+.details-block .stats p .label {
+  text-transform: uppercase;
+  font-size: 1rem;
+  margin-right: 5px;
+}
+
+.details-block .stats p .value {
+  color: #000;
 }

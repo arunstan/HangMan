@@ -5,45 +5,92 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function App() {
+  const WORD_JAR_SIZE_INIT = 1;
+  const WORD_JAR_SIZE_REFRESH = 3;
+  const WORD_FETCH_BUFFER = 3;
+  const WORD_POST_REVEAL_DURATION = 1500;
+
   const [word, setWord] = useState("");
   const [filledLetters, setFilledLetters] = useState([]);
   const [wordDefinition, setWordDefinition] = useState("");
   const [isDisabledNext, setIsDisabledNext] = useState(false);
   const [solvedCount, setSolvedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+  const [wordJar, updateWordJar] = useState([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
-    setIsDisabledNext(true);
-    fetchWord();
+    initGame();
   }, []);
 
   useEffect(() => {
+    setIsDisabledNext(true);
+    if (isDataLoaded) {
+      pickWord();
+      setIsDisabledNext(false);
+    }
+  }, [isDataLoaded]);
+
+  useEffect(() => {
+    if (wordJar.length > 0) {
+      fetchWords(WORD_JAR_SIZE_REFRESH);
+    }
+  }, [wordJar]);
+
+  useEffect(() => {
     determineFilledLetters();
-    fetchWordDefinition();
   }, [word]);
 
   useEffect(() => {
     if (isWordFilled()) {
       setSolvedCount((solvedCount) => solvedCount + 1);
-      setIsDisabledNext(true);
-      setTimeout(resetWord, 2000);
+      setTimeout(pickWord, WORD_POST_REVEAL_DURATION);
     }
   }, [filledLetters]);
 
-  const resetWord = () => {
-    setWord("");
-    setWordDefinition("");
-    setFilledLetters([]);
-    fetchWord();
+  const initGame = async () => {
+    await fetchWords(WORD_JAR_SIZE_INIT);
+    setIsDataLoaded(true);
   };
 
-  const fetchWordDefinition = async () => {
+  const pickWord = () => {
+    const [nextWord, ...restWords] = wordJar;
+    setFilledLetters([]);
+    updateWordJar(restWords);
+    setWord(nextWord.word);
+    setWordDefinition(nextWord.wordDefinition);
+    setTotalCount((totalCount) => totalCount + 1);
+  };
+
+  const fetchWords = async (wordJarSize) => {
+    const fetchedWords = [];
+    const wordsInJar = wordJar.length;
+    let wordsRequired =
+      wordsInJar < wordJarSize
+        ? wordJarSize - wordsInJar + WORD_FETCH_BUFFER
+        : 0;
+    if (wordsRequired) {
+      while (wordsRequired) {
+        const word = await fetchWord();
+        const wordDefinition = await fetchWordDefinition(word);
+        if (word && wordDefinition) {
+          fetchedWords.push({
+            word: word.toUpperCase(),
+            wordDefinition
+          });
+          wordsRequired--;
+        }
+      }
+      updateWordJar((wordJar) => [...wordJar, ...fetchedWords]);
+    }
+  };
+
+  const fetchWordDefinition = async (word) => {
     try {
       if (word) {
         const { data: wordDefnData } = await axios.get(
           `https://api.dictionaryapi.dev/api/v2/entries/en_US/${word}`
         );
-        console.log(wordDefnData);
         if (wordDefnData.length) {
           const [wordDefn] = wordDefnData;
           const { meanings } = wordDefn;
@@ -51,13 +98,12 @@ export default function App() {
           const { definitions } = meaningData;
           const [definitionData] = definitions;
           const { definition } = definitionData;
-          console.log(definition);
-          setWordDefinition(definition);
+          return definition;
         }
       }
     } catch (e) {
       console.error("Error while fetching word definition data ", e);
-      setWordDefinition("");
+      return "";
     }
   };
 
@@ -67,13 +113,10 @@ export default function App() {
         "https://random-word-api.herokuapp.com/word?swear=0"
       );
       const [word] = wordData;
-      if (word) {
-        setWord(word.toUpperCase());
-        setIsDisabledNext(false);
-        setTotalCount((totalCount) => totalCount + 1);
-      }
+      return word || "";
     } catch (e) {
       console.error("Error while fetching word data ", e);
+      return "";
     }
   };
 
@@ -119,11 +162,15 @@ export default function App() {
   };
 
   const handleClickNext = () => {
-    resetWord();
+    pickWord();
   };
 
   const renderCurrentWord = () => {
-    return <CurrentWord word={word} filledLetters={filledLetters} />;
+    return word ? (
+      <CurrentWord word={word} filledLetters={filledLetters} />
+    ) : (
+      "Loading..."
+    );
   };
 
   const renderWordDefiniton = () => {
@@ -158,16 +205,30 @@ export default function App() {
       Next
     </button>
   );
+
+  const renderDetails = () => (
+    <div className="details-block">
+      <div className="stats">
+        <p>
+          <span className="label">Solved:</span>
+          <span className="value">{solvedCount}</span>
+        </p>
+        <p>
+          <span className="label">Attempted:</span>
+          <span className="value">{totalCount}</span>
+        </p>
+      </div>
+      {renderNextButton()}
+    </div>
+  );
+
   return (
     <div id="container">
       <div className="app">
         {renderCurrentWord()}
         {renderWordDefiniton()}
         {renderLetterButtons(getLetters())}
-        <p>
-          {solvedCount}/{totalCount}
-        </p>
-        {renderNextButton()}
+        {renderDetails()}
       </div>
     </div>
   );
