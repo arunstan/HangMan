@@ -9,6 +9,7 @@ export default function App() {
   const WORD_JAR_SIZE_REFRESH = 3;
   const WORD_FETCH_BUFFER = 3;
   const WORD_POST_REVEAL_DURATION = 2000;
+  const LOADING_TITLE = "LOADING";
 
   const [word, setWord] = useState("");
   const [filledLetters, setFilledLetters] = useState([]);
@@ -19,6 +20,7 @@ export default function App() {
   const [wordJar, updateWordJar] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isWordSolved, setIsWordSolved] = useState(false);
+  const [loadingLetters, setLoadingLetters] = useState([]);
 
   useEffect(() => {
     initGame();
@@ -40,6 +42,17 @@ export default function App() {
 
   useEffect(() => {
     determineFilledLetters();
+  }, [word]);
+
+  useEffect(() => {
+    let timerID = null;
+    if (!word) {
+      getLoadingLetters();
+      timerID = setInterval(getLoadingLetters, 400);
+    }
+    return () => {
+      clearInterval(timerID);
+    };
   }, [word]);
 
   useEffect(() => {
@@ -196,7 +209,7 @@ export default function App() {
             key={idx}
             letter={letter}
             handleClick={handleLetterButtonClick}
-            disabled={filledLetters.includes(letter)}
+            disabled={!word || filledLetters.includes(letter)}
           />
         ))}
       </div>
@@ -229,10 +242,32 @@ export default function App() {
     </div>
   );
 
+  const getLoadingLetters = () => {
+    const requiredLettersMax = Math.ceil(LOADING_TITLE.length / 2) + 1;
+    let requiredLetters = [];
+    for (let i = 0; i < requiredLettersMax; i++) {
+      requiredLetters.push(
+        LOADING_TITLE.charAt(Math.random() * LOADING_TITLE.length)
+      );
+    }
+    setLoadingLetters(requiredLetters);
+    setWordDefinition(
+      "Prepare data and resources for a computer program to function"
+    );
+  };
+
+  const renderLoadingWord = () => (
+    <CurrentWord
+      word={LOADING_TITLE}
+      filledLetters={loadingLetters}
+      isWordSolved={false}
+    />
+  );
+
   return (
     <div id="container">
       <div className="app">
-        {renderCurrentWord()}
+        {word ? renderCurrentWord() : renderLoadingWord()}
         {renderWordDefiniton()}
         {renderLetterButtons(getLetters())}
         {renderDetails()}
