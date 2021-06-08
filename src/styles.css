@@ -75,6 +75,11 @@ h1 {
   text-shadow: 1px 1px 12px #ccc;
 }
 
+.current-word.is-time-over {
+  color: #c30000;
+  text-shadow: 1px 1px 12px #ff8c8c;
+}
+
 .next-button {
   font-size: 1.5rem;
   text-transform: uppercase;

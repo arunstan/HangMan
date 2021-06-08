@@ -8,8 +8,10 @@ export default function App() {
   const WORD_JAR_SIZE_INIT = 1;
   const WORD_JAR_SIZE_REFRESH = 3;
   const WORD_FETCH_BUFFER = 3;
-  const WORD_POST_REVEAL_DURATION = 2000;
+  const WORD_POST_REVEAL_DURATION_SOLVED = 2000;
+  const WORD_POST_REVEAL_DURATION_TIME_OVER = 3000;
   const LOADING_TITLE = "LOADING";
+  const WORD_TIME_LIMIT = 20;
 
   const [word, setWord] = useState("");
   const [filledLetters, setFilledLetters] = useState([]);
@@ -21,6 +23,8 @@ export default function App() {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isWordSolved, setIsWordSolved] = useState(false);
   const [loadingLetters, setLoadingLetters] = useState([]);
+  const [timeRemaining, setTimeRemaining] = useState(WORD_TIME_LIMIT);
+  const [isTimeOver, setIsTimeOver] = useState(false);
 
   useEffect(() => {
     initGame();
@@ -56,12 +60,31 @@ export default function App() {
   }, [word]);
 
   useEffect(() => {
-    if (checkIsWordSolved()) {
+    if (!isTimeOver && checkIsWordSolved()) {
       setIsWordSolved(true);
       setSolvedCount((solvedCount) => solvedCount + 1);
-      setTimeout(pickWord, WORD_POST_REVEAL_DURATION);
+      setTimeout(pickWord, WORD_POST_REVEAL_DURATION_SOLVED);
     }
   }, [filledLetters]);
+
+  useEffect(() => {
+    let timerID = null;
+    if (word && timeRemaining && !isWordSolved) {
+      timerID = setInterval(() => {
+        setTimeRemaining((timeRemaining) => timeRemaining - 1);
+      }, 1000);
+    }
+    return () => {
+      clearInterval(timerID);
+    };
+  }, [timeRemaining, word]);
+
+  useEffect(() => {
+    if (!timeRemaining) {
+      setIsTimeOver(true);
+      setTimeout(pickWord, WORD_POST_REVEAL_DURATION_TIME_OVER);
+    }
+  }, [timeRemaining]);
 
   const initGame = async () => {
     await fetchWords(WORD_JAR_SIZE_INIT);
@@ -70,6 +93,8 @@ export default function App() {
 
   const pickWord = () => {
     setIsWordSolved(false);
+    setIsTimeOver(false);
+    setTimeRemaining(WORD_TIME_LIMIT);
     const [nextWord, ...restWords] = wordJar;
     setFilledLetters([]);
     updateWordJar(restWords);
@@ -182,11 +207,13 @@ export default function App() {
   };
 
   const renderCurrentWord = () => {
+    const lettersFilled = isTimeOver ? word.split("") : filledLetters;
     return word ? (
       <CurrentWord
         word={word}
-        filledLetters={filledLetters}
+        filledLetters={lettersFilled}
         isWordSolved={isWordSolved}
+        isTimeOver={isTimeOver}
       />
     ) : (
       "Loading..."
@@ -239,6 +266,10 @@ export default function App() {
         </p>
       </div>
       {renderNextButton()}
+      <p>
+        <span>Time Remaining:</span>
+        <span>{timeRemaining}</span>
+      </p>
     </div>
   );
 
