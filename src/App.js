@@ -151,7 +151,7 @@ export default function App() {
   const fetchWord = async () => {
     try {
       const { data: wordData } = await axios.get(
-        "https://random-word-api.herokuapp.com/word?swear=0"
+        "https://random-word-api.herokuapp.com/word"
       );
       const [word] = wordData;
       return word || "";
